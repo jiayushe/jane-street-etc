@@ -41,6 +41,7 @@ def connect():
 def write_to_exchange(exchange, obj):
     json.dump(obj, exchange)
     exchange.write("\n")
+    print(obj)
 
 def read_from_exchange(exchange):
     return json.loads(exchange.readline())
