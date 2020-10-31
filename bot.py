@@ -28,19 +28,52 @@ prod_exchange_hostname="production"
 port=25000 + (test_exchange_index if test_mode else 0)
 exchange_hostname = "test-exch-" + team_name if test_mode else prod_exchange_hostname
 
+currentId = 0
+
 # ~~~~~============== NETWORKING CODE ==============~~~~~
+
+
 def connect():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((exchange_hostname, port))
     return s.makefile('rw', 1)
 
+
 def write_to_exchange(exchange, obj):
     json.dump(obj, exchange)
     exchange.write("\n")
 
+
 def read_from_exchange(exchange):
     return json.loads(exchange.readline())
 
+
+def sell_symbol(exchange, symbol, price, size):
+    global currentId
+    write_to_exchange(exchange, {
+        "type": "add",
+        "order_id": currentId,
+        "symbol": symbol,
+        "dir": "SELL",
+        "price": price,
+        "size": size
+    })
+    currentId += 1
+    return currentId
+
+
+def buy_symbol(exchange, symbol, price, size):
+    global currentId
+    write_to_exchange(exchange, {
+        "type": "add",
+        "order_id":currentId,
+        "symbol": symbol,
+        "dir": "BUY",
+        "price": price,
+        "size": size
+    })
+    currentId += 1
+    return currentId
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -58,6 +91,9 @@ def main():
         if(message["type"] == "close"):
             print("The round has ended")
             break
+
+        buy_symbol(exchange, "BOND", 999, 50)
+        sell_symbol(exchange, "BOND", 1001, 50)
 
 if __name__ == "__main__":
     main()
