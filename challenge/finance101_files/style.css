@@ -1,0 +1,122 @@
+body {
+  font-family: monospace;
+  font-size: 2em;
+  max-width: 35em;
+  padding-left: 3em;
+}
+
+div#icons-for-top-3 {
+  z-index: 2;
+  position: absolute;
+  top: 150px;
+  left: 400px;
+}
+
+div#container {
+  background: url("img/etc_logo.svg") no-repeat;
+  background-attachment: fixed;
+  background-position: 13em -11em;
+  padding: .5em;
+  min-width: 400px;
+  z-index: 1;
+}
+
+#rank1 {
+  width: 300px;
+  height: auto;
+}
+#rank2 {
+  width: 150px;
+  height: auto;
+}
+#rank3 {
+  width: 80px;
+  height: auto;
+}
+
+div#homepage-text, div#handout { padding: .5em; }
+div#homepage-text { background-color: rgba(255, 255, 255, 0.75); }
+div#handout       { background-color: rgba(255, 255, 255, 0.90); }
+
+div#homepage-text *:first-child {
+  margin-top: 0;
+}
+
+h1 { font-weight: bold; margin: .3em 0; }
+
+/* For the homepage: */
+
+div#email { text-align: center; font-size: 1.3em; font-weight: bold; }
+div#email a { color: black; }
+div#email a:hover { text-decoration: none; }
+
+p#prize {
+  font-size: 2em;
+  font-weight: bold;
+  color: rgb(25,25,255);
+  text-align: center;
+}
+
+/* For the handout. */
+
+#handout { font-size: 0.6em; }
+
+/* Override the default "font-size: medium;" */
+#handout table { font-size: 1em; }
+
+#handout pre {
+  border: 1px solid #ccc;
+  box-shadow: 3px 3px 3px #eee;
+  padding: .5em;
+  margin: 1em;
+  white-space: pre-wrap;
+}
+
+#handout .toc:before {
+  content: 'Table of Contents';
+  margin: 1em;
+  display: block;
+  font-weight: bold;
+}
+#handout .toc {
+  float: right;
+  margin: .5em .5em 5em 1em;
+  background-color: rgba(255, 255, 255, 0.75);
+}
+#handout .toc ul {
+  padding-left: 0;
+  margin: 1em;
+}
+#handout .toc li { list-style: none; }
+#handout .toc a { text-decoration: none; }
+#handout .toc li ul { display: none; }
+
+#handout table, #handout thead {
+  border-collapse: collapse;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+
+#handout td, #handout th {
+  padding: .4em 1em;
+}
+
+.positive {
+  text-color: green;
+}
+
+.positive td:nth-child(3) {
+  text-align: right;
+}
+
+.negative {
+  text-color: red;
+}
+
+.negative td:nth-child(3) {
+  text-align: right;
+}
+
+.zero td:nth-child(3) {
+  text-align: right;
+}

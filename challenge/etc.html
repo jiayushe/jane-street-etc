@@ -1,0 +1,638 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>etc</title>
+<link rel="stylesheet" type="text/css" href="./etc_files/style.css">
+</head>
+
+<body>
+<div id="container">
+<h1>etc</h1>
+<div id="handout">
+<div class="toc">
+<ul>
+<li><a href="#introduction-to-the-challenge">Introduction to the challenge</a></li>
+<li><a href="#getting-started">Getting started</a><ul>
+<li><a href="#developing-your-bot">Developing your bot</a></li>
+<li><a href="#do-not-remove-our-ssh-authorized-keys-on-your-bot-box">Do not remove our SSH authorized keys on your bot box</a></li>
+<li><a href="#testing-your-bot">Testing your bot</a></li>
+<li><a href="#connecting-to-the-exchange">Connecting to the exchange</a><ul>
+<li><a href="#test-exchange-host-and-ports">Test exchange host and ports</a></li>
+</ul>
+</li>
+<li><a href="#monitoring-your-bot">Monitoring your bot</a></li>
+</ul>
+</li>
+<li><a href="#the-challenge-structure">The challenge structure</a><ul>
+<li><a href="#your-portfolio">Your portfolio</a></li>
+<li><a href="#risk-limits">Risk limits</a></li>
+<li><a href="#profit-and-loss">Profit and loss</a></li>
+<li><a href="#rounds">Rounds</a><ul>
+<li><a href="#running-in-production">Running in production</a></li>
+</ul>
+</li>
+<li><a href="#timetable-and-scoring">Timetable and scoring</a></li>
+</ul>
+</li>
+<li><a href="#some-golden-rules">Some golden rules</a></li>
+<li><a href="#technical-details">Technical details</a><ul>
+<li><a href="#the-exchange-protocol">The exchange protocol</a></li>
+<li><a href="#exchange-protocol-example">Exchange protocol example</a><ul>
+<li><a href="#client-messages">Client messages</a></li>
+</ul>
+</li>
+<li><a href="#server-messages">Server messages</a></li>
+<li><a href="#types">'Types'</a></li>
+<li><a href="#handshake">Handshake</a></li>
+<li><a href="#orders">Orders</a></li>
+<li><a href="#public-feed">Public feed</a></li>
+<li><a href="#errors">Errors</a></li>
+<li><a href="#available-symbols">Available symbols</a></li>
+<li><a href="#market-hours">Market hours</a></li>
+</ul>
+</li>
+<li><a href="#advice-from-the-devs">Advice from the devs</a><ul>
+<li><a href="#keep-it-simple">Keep it simple</a></li>
+<li><a href="#start-trading-early">Start trading early</a></li>
+<li><a href="#if-something-seems-like-it-should-be-solved-for-you-already-it-probably-is">If something seems like it should be solved for you already, it probably is</a></li>
+<li><a href="#spend-some-time-to-make-sure-you-can-debug-your-bot">Spend some time to make sure you can debug your bot</a></li>
+</ul>
+</li>
+<li><a href="#advice-from-the-traders">Advice from the traders</a><ul>
+<li><a href="#step-1-trading-bond">Step 1: trading BOND</a></li>
+<li><a href="#step-2-trading-the-valbzvale-adr-pair">Step 2: trading the VALBZ/VALE ADR pair</a></li>
+<li><a href="#step-3-the-xlf-etf">Step 3: the XLF ETF</a></li>
+<li><a href="#get-going">Get going!</a></li>
+<li><a href="#maximize">Maximize!</a></li>
+</ul>
+</li>
+<li><a href="#faq">FAQ</a><ul>
+<li><a href="#my-messages-are-being-ignored">My messages are being ignored!</a></li>
+<li><a href="#can-i-use-favorite-library-or-favorite-search-engine">Can I use &lt;favorite library&gt; or &lt;favorite search engine&gt;?</a></li>
+</ul>
+</li>
+<li><a href="#quiz">Quiz</a></li>
+</ul>
+</div>
+<h2 id="introduction-to-the-challenge">Introduction to the challenge</h2>
+<p><code>etc</code> is a programming challenge. The goal is to write a program that will make
+fake money by trading securities on a fake financial exchange. The market
+participants will include other people's programs, as well as some programs
+provided by us (the 'marketplace bots'). To start, read over this brief <a href="./finance101.html">intro
+to finance</a> to learn the basic financial concepts and trading
+strategies you will need for this competition.</p>
+<h2 id="getting-started">Getting started</h2>
+<h3 id="developing-your-bot">Developing your bot</h3>
+<p>We will be running this challenge on Amazon EC2.</p>
+<p>Each team will receive one Ubuntu Linux box in the cloud which is yours and
+yours alone, which we'll call your 'bot box'. You can develop there if you
+wish, or you can develop on your laptop and upload to your box. If you choose
+the latter route, be sure to check that your binary actually works in the
+cloud.</p>
+<p>When we are ready to begin, we will tell you the (public) IP address of your
+bot box. To get started, log in to the box by opening a terminal on your laptop
+and using ssh:</p>
+<pre><code>ssh ubuntu@54.154.27.172     # Replace with your bot box's public IP
+</code></pre>
+<p>If you're developing on your local machine, an easy way to copy your code to
+your bot box is with the command 'scp', which follows similar semantics to cp:</p>
+<pre><code># Replace 54.154.27.172 with your bot box's public IP
+# Copies $LOCAL_PATH to $REMOTE_PATH
+scp $LOCAL_PATH ubuntu@54.154.27.172:$REMOTE_PATH
+</code></pre>
+<p>If you'd like, you can change your password to something more memorable at this
+point using the standard unix utility 'passwd'. Alternatively, you can add an
+SSH key to '~/.ssh/authorized_keys' so you don't have to type a password.</p>
+<h3 id="do-not-remove-our-ssh-authorized-keys-on-your-bot-box">Do not remove our SSH authorized keys on your bot box</h3>
+<p>We need to be able to SSH into the bot boxes in order to connect them to the
+production exchanges. If you remove us, your bot will not be able to compete.</p>
+<h3 id="testing-your-bot">Testing your bot</h3>
+<p>You have access to three test exchanges where you can test out your bot. The
+three exchanges run slightly different versions of the marketplace. On the
+zeroth exchange ('0-prod-like'), the marketplace runs at the true competition
+speed and simulates real rounds by restarting every five minutes. On the first
+exchange ('1-slower'), the marketplace runs more slowly and does not restart.
+On the second exchange ('2-empty'), there is no marketplace ' the exchange is
+empty, ready for you to play around with.</p>
+<p>The same symbols are available on the test exchanges as on the prod exchanges.
+Each trial will have the same starting prices for all of the symbols, but the
+price path after that is random ' you should not expect them to remain
+consistent between the test and prod exchanges, nor even between two different
+games on a prod exchange.</p>
+<h3 id="connecting-to-the-exchange">Connecting to the exchange</h3>
+<p>You must establish a TCP connection to the exchange. There is a different port
+depending on whether you want to use the plain-text protocol or the JSON
+protocol. The technical details surrounding the exchange protocol can be found
+<a href="#the-exchange-protocol">here</a>.</p>
+<p>Each team may have at most one connection open to an exchange at any time.</p>
+<p>If you have never done any socket programming before, you might want to Google
+for some tutorials for writing TCP clients. Both the 'plain' and JSON protocols
+are line based'that is, every message ends with a newline'so you might
+want to look for advice about line buffering. Here are some starting points for
+a few languages:</p>
+<ul>
+<li><a href="./code/sample-bot.py">Python</a></li>
+<li><a href="./code/sample-bot.cpp">C/C++</a></li>
+<li><a href="./code/Sample-bot.java">Java</a></li>
+<li><a href="./code/sample_bot.ml">OCaml</a></li>
+</ul>
+<p>Note that the model is different from a request/response protocol like HTTP:
+you connect, and the server continually sends you data as soon as an event
+(e.g. a trade or new order) occurs. There is no need (and indeed, no way) to
+regularly ask the server what the current status is.</p>
+<h4 id="test-exchange-host-and-ports">Test exchange host and ports</h4>
+<p>If your team name is ORANGE, then your test exchanges can be found on the host
+'test-exch-orange'. If you need an IP address, you can find it like so:</p>
+<pre><code>ubuntu@bot-orange:~$ host test-exch-orange
+test-exch-orange has address 10.0.109.63   # (for example)
+</code></pre>
+<p>The plain text ports for the prod-like, slower, and empty exchanges are 20000,
+20001 and 20002 respectively; the JSON ports are 25000, 25001 and 25002.</p>
+<p>For example, you can connect to the prod-like test exchange using netcat:</p>
+<pre><code>$ nc test-exch-teamname 20000 # Replace "teamname" with your team name here
+HELLO TEAMNAME                # ... and here (uppercase)
+</code></pre>
+<h3 id="monitoring-your-bot">Monitoring your bot</h3>
+<p>You can see the current books on the exchanges, as well as all positions and
+the history of trades. Use your team name and password to log in.</p>
+<p><a href="http://asia.etc.janestreet.com:8080/">http://asia.etc.janestreet.com:8080</a></p>
+<p>At this point, you should manually connect to a test exchange, place some
+orders (using netcat), and observe the exchange state at the above URL.</p>
+<h2 id="the-challenge-structure">The challenge structure</h2>
+<p>The challenge consists of a series of five minute matchups. In each matchup,
+you and another team compete to be the best market maker, providing liquidity
+to a third bot called the 'marketplace'.</p>
+<p>The marketplace has an internal random process for each stock which represents
+the fair value of that stock. (At the end of the matchup, the portfolio you
+have amassed will be evaluated using these fair values ' <a href="#profit-and-loss">see
+below</a>). The marketplace will send some orders around the
+fair value. Some orders will, like yours, be orders intended to provide
+liquidity. Other orders from the marketplace will be emulating liquidity
+demanders ' people who just wish to buy or sell a certain amount of shares,
+and don't care too much about the price they get.</p>
+<p>In particular, it is not the marketplace's job to make money. Although
+technically speaking the marketplace is a 'bot', its positions or pnl is not
+very relevant. The marketplace is meant to represent a whole bunch of different
+market participants, some of whom are more price-sensitive than others. This is
+representative of the fact that we mentioned in the finance intro ' it's
+unhelpful to think of trading as a zero-sum game.</p>
+<p>You can choose to participate, or not, in a given matchup, or join after the
+matchup begins, or give up halfway through ' whatever you want.</p>
+<p>At the end of a matchup, the exchange closes and then reopens shortly
+afterwards for the next matchup, where you'll be playing alongside a different
+team. We reset your cash and positions too. You'll want to make sure your bot
+can reconnect automatically when the exchange re-opens for the next matchup.</p>
+<h3 id="your-portfolio">Your portfolio</h3>
+<p>You have an account (like a bank account) that can hold both currency and
+shares in financial securities. At the beginning of each matchup your account
+is empty ' no currency, no shares. The number of shares of a particular
+security that you own is called your /position/ in that security. If you buy
+a share by paying a currency, your position in that currency goes down and your
+position in that stock goes up. If you sell, the opposite. In this competition,
+the only currency we'll be dealing with is USD (US Dollars). Since USD is the
+only currency we'll be using, we may refer to it as 'cash' in this handout.</p>
+<p>Note that it is possible to have a negative position in any product including
+cash ' you can effectively borrow money or shares from the bank at which you
+hold the account.</p>
+<h3 id="risk-limits">Risk limits</h3>
+<p>Your position in each security will be limited, with the limits depending on
+which stock or ETF you're trading ' see the table below. For example, in BOND,
+the position limit is 100 shares; that means your position in BOND may never be
+less than -100 or greater than +100. In the real world, our positions are
+limited by the availablity of stock borrow, capital constraints, and crash
+risk. Obviously, the greater your position, the more exposed you are to a crash
+in this security.</p>
+<table>
+<thead>
+<tr>
+<th>symbol</th>
+<th align="right">limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BOND</td>
+<td align="right">100</td>
+</tr>
+<tr>
+<td>VALBZ</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td>VALE</td>
+<td align="right">10</td>
+</tr>
+<tr>
+<td>GS</td>
+<td align="right">100</td>
+</tr>
+<tr>
+<td>MS</td>
+<td align="right">100</td>
+</tr>
+<tr>
+<td>WFC</td>
+<td align="right">100</td>
+</tr>
+<tr>
+<td>XLF</td>
+<td align="right">100</td>
+</tr>
+</tbody>
+</table>
+<p>These are enforced by the exchange: if you send an order such that if it and
+all your other orders in the same symbol and direction were fully filled it
+would put you over your position limits, then your order will be rejected.</p>
+<p>There are no direct limits on your cash balance in either direction.</p>
+<p>However, there are limits on your profit/loss. If at some point you get to
+a stage where your current pnl is too negative, you will be determined to have
+'blown out'. We'll stop your participation in that matchup there, and close any
+positions you have at the fair value at that time. The limit is -30,000.</p>
+<h3 id="profit-and-loss">Profit and loss</h3>
+<p>Your profit/loss (aka 'pnl') can be computed by taking the amount of cash in
+your account (e.g. if you buy a security for 10, and then sell it for 12, you
+would have 2 cash in your account), and adding the value of all your holdings
+(again, as determined by the marketplace's internal notion of fair value). The
+main goal is to maximize your pnl over all the rounds you participate in.
+Another important goal is to avoid doing very poorly in any given round. This
+is reflective of the real world: you may do particularly well on some days, but
+you really want to avoid losing all your money on any given day because then
+you're out of a job.</p>
+<h3 id="rounds">Rounds</h3>
+<p>A round will last for five minutes, after which the exchange will shut down.
+A new exchange will shortly start up and be available on the same address.</p>
+<p>We don't carry your positions forward from one game to the next.</p>
+<p><em>Be careful</em> ' you should not assume that the values of securities in one game
+will be anywhere near the values in a previous game.</p>
+<p>If your bot quits once its connection to the exchange goes down, you might want
+to run your bot in a bash loop so that it automatically reconnects:</p>
+<pre><code>while true; do ./bot.exe; sleep 5; done
+</code></pre>
+<h4 id="running-in-production">Running in production</h4>
+<p>When you're ready to run your bot in production, have it connect to the host
+'production' on port 20000 (plain text protocol) or port 25000 (JSON protocol).</p>
+<p>('production' is a hostname that will resolve via DNS. If you need an IP
+address, use '1.1.1.1').</p>
+<p>You can see the results from your previous production round here:</p>
+<p><a href="http://asia.etc.janestreet.com:8080/go/last-round-results">http://asia.etc.janestreet.com:8080/go/last-round-results</a></p>
+<h3 id="timetable-and-scoring">Timetable and scoring</h3>
+<p>There will be two distinct competitions, with two distinct prizes.</p>
+<p>The first will run (more-or-less) continuously between 11:30 am and 6:00 pm.
+Here's how your score for each individual matchup will contribute to your
+overall competition score.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Phase</th>
+<th align="left">Length</th>
+<th align="right">%</th>
+<th align="right">Start</th>
+<th align="right">End</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">A</td>
+<td align="left">1.5 hr</td>
+<td align="right">30%</td>
+<td align="right">11:30 am</td>
+<td align="right">1:00 pm</td>
+</tr>
+<tr>
+<td align="left">B</td>
+<td align="left">3.0 hr</td>
+<td align="right">30%</td>
+<td align="right">1:00 pm</td>
+<td align="right">4:00 pm</td>
+</tr>
+<tr>
+<td align="left">C</td>
+<td align="left">2.0 hr</td>
+<td align="right">40%</td>
+<td align="right">4:00 pm</td>
+<td align="right">6:00 pm</td>
+</tr>
+</tbody>
+</table>
+<p>At 5:00 pm we will start the second, simultaneous competition: 'The Final Hour'.
+The winner of this competition is the team that has the highest cumulative score
+in just the last hour of competition.</p>
+<h2 id="some-golden-rules">Some golden rules</h2>
+<ol>
+<li>You must not attempt to manipulate other people's bots.</li>
+<li>You must not attempt to manipulate the exchange.</li>
+<li>Your bot should be entirely written by your team over the course of this ETC (standard libraries
+   are fine).</li>
+<li>Don't do anything you wouldn't do on a real exchange.</li>
+</ol>
+<p>You are building a bot to provide a service to the marketplace bots, and
+attempting to do so in the best possible way.</p>
+<p>Some examples of what would count as manipulation:</p>
+<ul>
+<li>Trading with yourself in order to publish 'fake' trades to all participants,
+  in an attempt to have them believe the trade price is a reasonable fair value
+  for the security.</li>
+<li>Sending orders to the exchange where you know at the time of sending that you
+  want to cancel the orders and never let them trade. If you think it would be
+  a bad idea to buy security for price P, then you shouldn't send orders to buy
+  that security for price P.</li>
+</ul>
+<p>Don't download a bot from the internet and run that instead of writing a bot.
+Or other silly things like that. Basically, don't be a jerk.</p>
+<p>We reserve the right to subtract some from your bot's profit, or disqualify you
+completely, if we feel you've violated these rules. Obviously they are somewhat
+vague. Please come talk to us if you have any concerns. If you find a bug in
+the exchange, please tell us. If you think someone else has been deliberately
+manipulating your bot, please tell us too.</p>
+<h2 id="technical-details">Technical details</h2>
+<h3 id="the-exchange-protocol">The exchange protocol</h3>
+<p>What sorts of messages form the protocol between the exchange and you?</p>
+<p>You to exchange:</p>
+<ul>
+<li>Hello: the first message you must send, identifying yourself to the exchange</li>
+<li>Add: a request to buy or sell a security; 'add order'</li>
+<li>Cancel: a request to remove from the book some previously-placed order that
+  hasn't traded yet</li>
+<li>Convert: a request to convert an ETF or ADR (from or to its underlying
+  basket) </li>
+</ul>
+<p>Exchange to you (private):</p>
+<ul>
+<li>Hello: the first message the exchange will send you when you connect,
+  containing your positions</li>
+<li>Ack: 'your order was successfully placed on the book' (this does not mean it
+  traded!)</li>
+<li>Reject: 'your order wasn't valid for this reason: '' (e.g. negative price,
+  malformed syntax etc.)</li>
+<li>Error: an error related to your bot that's not associated with a specific
+  order</li>
+<li>Out: following a cancel or once your order is completely filled, 'your order
+  is no longer on the book'</li>
+<li>Fill: 'your order traded'</li>
+</ul>
+<p>Exchange to you (public):</p>
+<ul>
+<li>Book: 'the current state of the book is''</li>
+<li>Trade: 'two (anonymous) people traded at price X'</li>
+<li>Open: 'the market for a specific security has opened'</li>
+<li>Close: 'the market for a specific security has closed'</li>
+</ul>
+<h3 id="exchange-protocol-example">Exchange protocol example</h3>
+<h4 id="client-messages">Client messages</h4>
+<pre><code>HELLO TEAMNAME
+ADD ID SYMBOL BUY|SELL PRICE SIZE
+CONVERT ID SYMBOL BUY|SELL SIZE
+CANCEL ID
+
+{"type": "hello", "team": "ASDF"}
+{"type": "add", "order_id": N, "symbol": "SYM", "dir": "BUY", "price": N, "size": N}
+{"type": "convert", "order_id": N, "symbol": "SYM", "dir": "BUY", "size": N}
+{"type": "cancel", "order_id": N}
+</code></pre>
+<h3 id="server-messages">Server messages</h3>
+<pre><code>HELLO SYM:POSN SYM:POSN ...
+OPEN SYM SYM SYM ...
+CLOSE SYM SYM SYM ...
+ERROR MSG
+BOOK SYMBOL BUY PRICE:SIZE PRICE:SIZE ... SELL PRICE:SIZE PRICE:SIZE ...
+TRADE SYMBOL PRICE SIZE
+ACK ID
+REJECT ID MSG
+FILL ID SYMBOL DIR PRICE SIZE
+OUT ID
+
+{"type":"hello","symbols":[{"symbol":"SYM","position":N}, ...]}
+{"type":"open","symbols":["SYM1", "SYM2", ...]}
+{"type":"close","symbols":["SYM1", "SYM2", ...]}
+{"type":"error","error":"MSG"}
+{"type":"book","symbol":"SYM","buy":[[PRICE,SIZE], ...],"sell":[...]}
+{"type":"trade","symbol":"SYM","price":N,"size":N}
+{"type":"ack","order_id":N}
+{"type":"reject","order_id":N,"error":"MSG"}
+{"type":"fill","order_id":N,"symbol":"SYM","dir":"BUY","price":N,"size":N}
+{"type":"out","order_id":N}
+</code></pre>
+<p>Please note that the protocol is case sensitive, and you should imitate the
+above.</p>
+<h3 id="types">'Types'</h3>
+<ul>
+<li>DIR: A direction is one of 'BUY' or 'SELL'.</li>
+<li>TEAMNAME, SYMBOL: Team names and symbols are <em>uppercase</em> alpha only.</li>
+<li>PRICE, SIZE: Prices and sizes are <em>positive</em> integers strictly less
+  than 1000000.</li>
+<li>POSN: Positions are integers (at least smaller than 2^32)</li>
+<li>ID: Order ids are non-negative integers (at least smaller than 2^32)</li>
+<li>MSG: Arbitrary strings potentially including spaces (but they won't contain
+  newlines or nulls or anything tricksy).</li>
+</ul>
+<h3 id="handshake">Handshake</h3>
+<p>You must issue the 'hello' message first, and you must be accurate with your
+team name ' don't impersonate someone else!</p>
+<p>You will immediately receive a 'hello' from the exchange (or an error). The
+hello will include your current positions in each symbol (including USD). At
+the start these will all be zero; these numbers are only useful to you if you
+crash and reconnect (which you shouldn't be planning on doing!).</p>
+<h3 id="orders">Orders</h3>
+<p>You, the client, must pick unique identifiers for your orders and send them
+along with the rest of the details in the 'add message'. Ack, reject, fill and
+out messages will refer to the order by this identifier. It need not be
+globally unique, merely unique to your connection to the exchange. Besides
+these restrictions, you may pick them however you like, remembering that they
+must be non-negative integers.</p>
+<p>To, say, enter a buy order for BOND with price 1002 and size 50, issue:</p>
+<pre><code>ADD 5 BOND BUY 1002 50
+
+{"type": "add", "order_id": 5, "symbol": "BOND", "dir": "BUY", "price": 1002, "size": 50}
+</code></pre>
+<p>You will receive either:</p>
+<pre><code>ACK 5
+
+{"type": "ack", "order_id": 5}
+</code></pre>
+<p>or:</p>
+<pre><code>REJECT 5 REASON
+
+{"type": "reject", "order_id": 5, "error": "REASON"}
+</code></pre>
+<p>where 'REASON' might be one of the strings mentioned above.</p>
+<p>Suppose that your order could trade immediately with a 'sell 10 at $1001' order
+that was resting on the market. Shortly after the ack you would receive:</p>
+<pre><code>FILL 5 BOND BUY 1001 10
+
+{"type": "fill", "order_id": 5, "symbol": "BOND", "dir": "BUY", "price": 1001, "size": 10}
+</code></pre>
+<p>The fill contains a reminder of the order's symbol and direction, the price
+that the order traded at, and the number of shares that traded.</p>
+<p>Note that your order is still on the market, but now its size is 40.</p>
+<p>When your order has been fully filled, you will also receive an 'out' message.
+Continuing the above example, if a little later on, someone else submitted
+a large low sell order, you would receive</p>
+<pre><code>FILL 5 BOND BUY 1002 40
+OUT 5
+
+{"type": "fill", "order_id": 5, "symbol": "BOND", "dir": "BUY", "price": 1002, "size": 40}
+{"type": "out", "order_id": 5}
+</code></pre>
+<p>Note that at roughly the same time as you receive a 'fill' message, you will
+also receive a 'trade' message.</p>
+<p>To cancel an order, issue</p>
+<pre><code>CANCEL 5
+
+{"type": "cancel", "order_id": 5}
+</code></pre>
+<p>The reply will be</p>
+<pre><code>OUT 5
+
+{"type": "out", "order_id": 5}
+</code></pre>
+<p>Provided you have completed the handshake, 'cancel' messages never fail: you
+will always receive an 'out' reply, even if the server does not recognise that
+order. If a cancel and a fill race (and the cancel loses), you might receive
+two outs for the same order id. Furthermore, you might receive an out for an
+order that was neither cancelled by you nor fully filled (an 'unsolicited
+out'), if the exchange decides it wants to cancel your order for some specific
+reason. You may wish to ignore outs you don't recognise.</p>
+<p>Conversions to and from an ADR or ETF are done using the CONVERT message, which is
+similar to ADD but without a price:</p>
+<pre><code>CONVERT 4 VALE BUY 10
+
+{"type": "convert", "order_id": 4, "symbol": "VALE", "dir": "BUY", "size": 10}
+</code></pre>
+<p>'BUY' means you receive the ADR/ETF and give out the constituent basket of stocks.
+'SELL' means you give out the ADR/ETF and receive the constituent basket of stocks.
+In both cases, you pay a conversion fee. You are not allowed to convert if it
+would put you over any position limit ' in the ADR/ETF or in the stocks. The order
+ID for conversions shares a namespace with orders.</p>
+<p>The reply will be either an ACK message or a REJECT message indicating whether
+the conversion was successful or not. It is not possible for a conversion to
+partially succeed.</p>
+<h3 id="public-feed">Public feed</h3>
+<p>Trade and book messages constitute the anonymised public feed.</p>
+<pre><code>TRADE BOND 1002 40
+
+{"type":"trade","symbol":"BOND","price":1002,"size":40}
+</code></pre>
+<p>means that 40 shares of BOND have traded at price $1002 between two people (or
+one person with themselves).</p>
+<pre><code>BOOK BOND BUY 999:12 998:100 995:1 SELL 1001:4 1002:15 1003:100
+
+{"type":"book","symbol":"BOND","buy":[[999,12],[998,100],[995,1]],"sell":[[1001,4],[1002,15],[1003,100]]}
+</code></pre>
+<p>means that one or more people are willing to buy BOND for $999, and the sum of
+the sizes of those orders is 12. (Willing to buy 100 shares of BOND for $998,
+etc.) On the other side, there are people willing to sell up to 4 shares at
+$1001.</p>
+<p>The book will be truncated to 15 price levels. It will be sorted
+most-aggressive-first (i.e. bids are high-to-low, offers are low-to-high), so
+that the best bid and offer are in the location indicated by 'BEST' below:</p>
+<pre><code>BOOK BOND BUY BEST OTHERS... SELL BEST OTHERS...
+
+{"type":"book","symbol":"BOND","buy":[BEST, ...],"sell":[BEST, ...]}
+</code></pre>
+<p>There are no guarantees about when you'll receive these messages in relation to
+the private ones. Notably:</p>
+<ul>
+<li>when you add an order, the 'book' update to include your order may arrive
+  before or after the ack (moreover, not necessarily immediately before or after)</li>
+<li>similarly for trade &amp; fill messages.</li>
+</ul>
+<h3 id="errors">Errors</h3>
+<p>'Error' and 'reject' messages are the server complaining about your bot. If the
+server is able to associate the error with an 'add' message, then it will send
+a 'reject' with the order id that failed and the error message. Otherwise, you
+will simply receive an 'error'.</p>
+<p>If the server detects that you have disconnected then all of your open orders
+will be canceled.</p>
+<h3 id="available-symbols">Available symbols</h3>
+<p>The following symbols are available:</p>
+<ul>
+<li>BOND</li>
+<li>VALBZ</li>
+<li>VALE</li>
+<li>GS</li>
+<li>MS</li>
+<li>WFC</li>
+<li>XLF</li>
+</ul>
+<p>The symbol BOND has a marketplace fair value of precisely 1000 at all times,
+but could possibly trade at other prices.</p>
+<p>VALBZ is a regular stock.</p>
+<p>The symbol VALE is an ADR of VALBZ (you can think of this as an ETF with one
+component). 1 share of VALE can be converted to/from 1 share of VALBZ. The
+conversion fee for VALE is a fixed cost of 10 per conversion (regardless of the
+number of shares converted).</p>
+<p>Symbols GS, MS, and WFC are regular stocks.</p>
+<p>The symbol XLF is an ETF. 10 shares of XLF can be converted to/from a basket of:</p>
+<ul>
+<li>3 BOND</li>
+<li>2 GS</li>
+<li>3 MS</li>
+<li>2 WFC</li>
+</ul>
+<p>You must convert XLF in multiples of 10. The conversion fee for XLF is a fixed
+cost of 100 per conversion (regardless of the number of shares converted). Note
+that to convert 10 XLF shares, the size in your 'convert' message should be 10,
+not 1.</p>
+<h3 id="market-hours">Market hours</h3>
+<p>You cannot add orders in a symbol when it is closed (or 'halted'): attempting
+to do so will produce a reject.</p>
+<p>The exchange will start with all symbols closed. It will then open, sending you
+an 'open' message to inform you of this, and then after some period of time
+close (sending you a 'close' message). Shortly afterwards it will shut down,
+simply closing its connection to you.</p>
+<h2 id="advice-from-the-devs">Advice from the devs</h2>
+<h3 id="keep-it-simple">Keep it simple</h3>
+<p>Most of the time, a complicated algorithm is hard to think about and hard to
+write.</p>
+<h3 id="start-trading-early">Start trading early</h3>
+<p>It's a good idea to find a strategy to make you money, and continue using it
+throughout the competition. You should try to provide liquidity early.</p>
+<h3 id="if-something-seems-like-it-should-be-solved-for-you-already-it-probably-is">If something seems like it should be solved for you already, it probably is</h3>
+<p>In past competitions, people have spent lots of time doing low-level things
+like writing line parsers for the TCP protocol. Every language that's been used
+in past <code>etc</code> events has had the native ability, or had libraries readily
+available to read whole lines from a socket.</p>
+<h3 id="spend-some-time-to-make-sure-you-can-debug-your-bot">Spend some time to make sure you can debug your bot</h3>
+<p>When there's a problem with your bot, make sure you can figure out what's going
+wrong. Many languages have built-in logging frameworks or great 3rd party
+libraries for these. Printf can also be your friend.</p>
+<h2 id="advice-from-the-traders">Advice from the traders</h2>
+<h3 id="step-1-trading-bond">Step 1: trading BOND</h3>
+<p>BOND should be pretty straightforward to trade for positive expectancy, since
+its fair value is known!  Buy it for less than 1000 or sell it for more than
+that and you're golden.  Fortunately, there's a lot more of interest to come.</p>
+<h3 id="step-2-trading-the-valbzvale-adr-pair">Step 2: trading the VALBZ/VALE ADR pair</h3>
+<p>These are two stocks for which the fair value changes over time but is always
+equal across the two.  VALBZ is the more liquid side, and so you'll notice that
+it's a better source of price information, but its a lot harder to make money
+trading.  Protip: use the more liquid leg (VALBZ) to price out and trade the
+less liquid leg (VALE).  The position bounds are tight, though, so you'll have
+to convert and trade both stocks if you want to maximize your expected profits.</p>
+<h3 id="step-3-the-xlf-etf">Step 3: the XLF ETF</h3>
+<p>Now instead of a one-to-one relationship, you'll need to price out a basket of
+stocks in order to trade XLF.  Again, due to the position bounds, careful
+position management (and converting) and good execution methods will be
+critical to success.</p>
+<h3 id="get-going">Get going!</h3>
+<p>The earlier you can get something simple that works out into the marketplace,
+the more time your bot can spend making profits.  Work on version 2.0 while
+you're making money with version 1.0.</p>
+<h3 id="maximize">Maximize!</h3>
+<p>Keep tuning and improving your algorithms; maybe a simple change to one of your
+parameters could double your profits per round.  Use the test exchange to
+experiment; the marketplace bots there are exactly the same as on the
+competition exchange.</p>
+<h2 id="faq">FAQ</h2>
+<h3 id="my-messages-are-being-ignored">My messages are being ignored!</h3>
+<p>You need to send a newline after each message (even when using the JSON protocol).</p>
+<h3 id="can-i-use-favorite-library-or-favorite-search-engine">Can I use &lt;favorite library&gt; or &lt;favorite search engine&gt;?</h3>
+<p>You are welcome (and encouraged!) to search for solutions to problems, standard
+libraries etc. online. But please don't download bot code, post solutions
+online, get someone to write code for you, or anything like that.</p>
+<h2 id="quiz">Quiz</h2>
+<p>To get started, complete a <a href="https://docs.google.com/forms/d/e/1FAIpQLSeLJ_OV1nY3CZHYYyOL-RrF_4f53vWWSKsZ9Q5ffoQPBuZK8Q/viewform">quick quiz</a> and then come see us
+  to get connection details for your box.</p>
+</div> 
+</div> 
+</body>
+</html>

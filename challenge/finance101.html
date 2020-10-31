@@ -1,0 +1,304 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>finance 101</title>
+<link rel="stylesheet" type="text/css" href="./finance101_files/style.css">
+</head>
+
+<body>
+<div id="container">
+<h1>finance 101</h1>
+<div id="handout">
+<h2 id="financial-instruments">Financial Instruments</h2>
+<p>At Jane Street, we trade many different financial instruments. For this
+competition, we will focus on a few basic types.</p>
+<h3 id="bonds">Bonds</h3>
+<p>A bond is a form of debt. The buyer supplies some capital to
+the seller, and in exchange the seller agrees to pay back that amount
+plus interest at a fixed time in the future.</p>
+<h3 id="stocks">Stocks</h3>
+<p>A share of stock is a financial instrument that represents the partial
+ownership of the company that issued it. The buyer supplies
+capital to the company, and in exchange receives ownership of a small
+fraction of the company. The buyer hopes that the company will pay out
+dividends to its shareholders and/or that the company's share value
+will increase so that they can sell the shares at a higher price than
+they bought them.</p>
+<h3 id="adrs">ADRs</h3>
+<p>Investors may want to invest in foreign companies without having
+to trade on foreign exchanges. An ADR (American Depository Receipt)
+is a receipt issued by a US bank that trades on a US exchange but
+represents a share in a foreign stock. An investor can pay the ADR
+issuer a fee to convert between the ADR and the corresponding foreign
+stock. An ADR can be thought of as a special case of an ETF
+(explained below) with only one component.</p>
+<h3 id="etfs">ETFs</h3>
+<p>Investors may want to invest in a market as a whole instead of in a
+single stock. For example, one might want to invest in the S&amp;P 500,
+an index of the 500 biggest US companies. However, for the average
+investor, going out and buying 500 different stocks would be expensive
+and time consuming. ETFs (Exchange Traded Funds) provide an easier and
+cheaper alternative. An ETF trades on the market like an ordinary
+stock, but it represents a basket of instruments. For instance, the
+SPDR S&amp;P 500 ETF has an underlying basket made up of the 500 stocks in
+the S&amp;P 500, so an easy way to invest in the US market as a whole is
+to buy this ETF. Just like for ADRs, an investor can pay the ETF
+issuer a fee to convert between the ETF and its corresponding
+basket. The actions of converting to and from an ETF are called
+'creating the ETF' and 'redeeming the ETF' respectively.</p>
+<h2 id="orders">Orders</h2>
+<p>In the most basic sense, trading consists of buying and selling securities. 
+An order is an instruction sent to an exchange to buy or
+sell a security, with certain constraints. The most common kind of
+order is a 'limit' order, which places a limit on the price at which you are
+willing to buy or sell.</p>
+<p>The parameters that specify a limit order are:</p>
+<ul>
+<li>The name of the security you want to trade</li>
+<li>Whether you want to buy or sell it</li>
+<li>The 'limit' price, i.e. the 'worst' price you're willing to trade
+  at (i.e. the highest price if you're buying, or the lowest price if you're selling)</li>
+<li>How many shares / contracts of the security you want to trade</li>
+</ul>
+<p>A 'bid' price is the limit price specified by a buy order, and an
+'offer' or 'ask' price is the limit price specified by a sell order.</p>
+<h2 id="stock-exchanges">Stock Exchanges</h2>
+<p>A lot of our trading occurs on exchanges, which are highly regulated electronic
+marketplaces that match up buyers and sellers in the following way:</p>
+<p>Suppose you're the first person to send an order that day. You send an order to buy
+10 BOND for $995. No-one is willing to trade against you right now, so the
+exchange just enters your order into the 'book' and it sits there. This is called
+a 'resting order'.</p>
+<table>
+<thead>
+<tr>
+<th align="right"></th>
+<th align="right">bids</th>
+<th align="right">offers</th>
+<th align="right"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">10</td>
+<td align="right">$995</td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+</tbody>
+</table>
+<p>Let's say someone else comes along and also sends an order to buy 100
+BOND for $995. They can't trade with you ' you both want to buy. So now the book
+looks like this:</p>
+<table>
+<thead>
+<tr>
+<th align="right"></th>
+<th align="right">bids</th>
+<th align="right">offers</th>
+<th align="right"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">110</td>
+<td align="right">$995</td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+</tbody>
+</table>
+<p>Note that the exchange displays the sum of all of the orders at a given price
+point and doesn't divide it up into the individual orders.</p>
+<p>A few more people come in and send: an order to sell 500 BOND at $1001, an
+order to sell 50 BOND at $1002, and an order to sell 3000 BOND at $1005. There is
+still no trading ' the most anyone is willing to buy for is $995, but the least
+anyone is willing to sell at is $1001. At this point, we say 'the
+market in BOND is $995 at $1001', meaning the 'best' (i.e. highest) bid is $995 and
+the 'best' (i.e. lowest) offer is $1001.</p>
+<table>
+<thead>
+<tr>
+<th align="right"></th>
+<th align="right">bids</th>
+<th align="right">offers</th>
+<th align="right"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">110</td>
+<td align="right">$995</td>
+<td align="right">$1001</td>
+<td align="right">500</td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right">$1002</td>
+<td align="right">50</td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right">$1005</td>
+<td align="right">3000</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, someone comes along and sends an order to sell 30 BOND at $995.
+This can trade with the buy orders. Which orders get 'filled'? First the 10-contract
+buy order gets fully filled, as it was on the exchange first (this is called
+'price-time priority': the orders are sorted first by price, and then by age).
+The owner of the buy order gets a message from the exchange telling them how many of their
+contracts traded (all 10 in this case). Now there are 20 contracts left from the 30-contract
+sell order. Next, the 100-contract buy order gets partially filled with the remaining 20 contracts.
+The owner of this buy order gets a message from the exchange as well, telling them 20 of their
+contracts traded. And of course, the owner of the sell order also gets a message (or possibly
+multiple messages) about their fills.</p>
+<p>After that's all done, the book looks like this:</p>
+<table>
+<thead>
+<tr>
+<th align="right"></th>
+<th align="right">bids</th>
+<th align="right">offers</th>
+<th align="right"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">80</td>
+<td align="right">$995</td>
+<td align="right">$1001</td>
+<td align="right">500</td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right">$1002</td>
+<td align="right">50</td>
+</tr>
+<tr>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right">$1005</td>
+<td align="right">3000</td>
+</tr>
+</tbody>
+</table>
+<h3 id="price-improvement">Price improvement</h3>
+<p>Any given trade is always between an order that was previously on the
+book (the resting order), and one that comes in and never gets
+entered into the book.</p>
+<p>The price of a trade is always that of the <em>resting</em> order. For
+example, if there is a resting order to buy for $80, and someone sends
+an order to sell at $70, a trade happens at $80.</p>
+<h2 id="the-business-of-market-making">The business of market making</h2>
+<p>Market making is one way that firms participate on the financial markets. The
+purpose of market making is to act as an intermediary for other people's trading.
+For example, suppose Alice wants to buy some shares, and Bob wants to sell some.
+It seems good for them to trade with each other, but if we require that they
+meet at the exchange at the same time, this is not likely to be efficient. If
+this were really how markets worked, you might be afraid to invest. Who knows
+whether you'd be lucky enough to find a buyer when you wanted to sell?
+And if you did find a counterparty, how would you agree on a fair price?</p>
+<p>Market makers are always willing to buy and always willing to sell. They have
+some conception of how much a security is worth right now (its 'fair value'),
+but no long term interest in owning the security. Market makers are always willing
+to buy for slightly below the fair value and sell at slightly above it. You can
+think of market making a bit like running a supermarket: you are simply the link
+between the sellers of goods (wholesale producers) and the buyers (shoppers).
+You charge some premium on your wholesale purchase price in order to make a profit.</p>
+<p>Unlike a supermarket however, a market maker can sell a security that they don't
+currently own, called 'short selling', and end up with a negative
+'position' (quantity that they own) in that security. You should try
+to keep your position close to 0 in order to limit your exposure to
+large price moves, on which you don't really have a long-term opinion.</p>
+<p>Note that it's wrong to think of trading as strictly a zero-sum game. In
+particular, there will be other participants in the <code>etc</code> market beyond the
+bots you create. Some of these might act like 'investors' ' people just
+wishing to buy (or sell) securities, who want to hold that position for a long
+time, putting capital at risk in order to earn a return. They're not very
+sensitive to the price, since they mostly just trust that the market has the
+fair price for the security right now. So they're likely to buy or sell on
+whatever market they see. Other participants are competing with you ' they
+have a rough idea of what they think the security is worth, and they'll try to
+buy below that and sell above it.</p>
+<h2 id="some-basic-trading-strategies">Some basic trading strategies</h2>
+<p>The basic strategy is:</p>
+<ul>
+<li>Have some idea of a fair value for each security</li>
+<li>Attempt to buy the security for less than fair, and sell it at more than fair</li>
+</ul>
+<h3 id="fair-values">Fair values</h3>
+<p>How might you come up with a fair value in the first place? Since markets (both
+in the real world and in this competition) tend to be fairly efficient most of
+the time, a good starting assumption is that the fair value is
+probably between the best bid and best offer; half-way between these
+(the 'mid') is usually a good starting guess.</p>
+<p>There are some classes of securities for which coming up with a better fair is
+relatively straightfoward. For example, as mentioned above, ETFs
+represent a basket of other securities. If there is an ETF called FRED, and one
+share of FRED contains 0.5 shares of HENRY and 4 shares of EMMA, then it should
+be fairly clear what the fair value for FRED is given a fair values for HENRY and
+EMMA.</p>
+<p>For non-ETF securities, it is less obvious what you might do. In
+general, predicting whether a stock will go up or down is hard, so it
+is unlikely you will be able to make money by betting on a stock going
+up or down. That said, it can still be possible to make money by
+providing liquidity in these stocks, but we will give no further
+hints in this section :)</p>
+<h3 id="trading-from-your-fair-value">Trading from your fair value</h3>
+<p>It may seem that all the trickery is in coming up with a fair, and indeed it is
+possible to do some very complex things in that space. But it's also not
+obvious how to trade around it. Let's look at some basic ideas.</p>
+<p>If you think a financial security is worth exactly $100, it is impossible to
+make money by sending buy or sell orders at exactly $100. Obviously, you'll
+want to send buy orders below $100 and sell orders above $100. The difference
+between the price of your order or fill and your fair value is called the edge.
+More precisely:</p>
+<pre><code>edge = dir_sign * (fair value - order price)
+where dir_sign = 1 for buying and -1 for selling
+</code></pre>
+<p>The way to think about edge is that it is the profit you earn by completing
+that trade.</p>
+<p>So given a fair value, where should you send orders? Let's look at two ideas:</p>
+<h3 id="pennying">Pennying</h3>
+<p>You want to earn the most edge you can. Pennying is the idea of looking at
+the current best bid and offer, and sending orders the minimum amount 'inside'
+that, i.e. sending a buy order for <code>current best bid + 1</code> and/or a sell order at
+<code>current best offer - 1</code>.</p>
+<p>This kind of strategy is an example of 'providing liquidity'. You place orders on the
+book, and when price-insensitive investors come along to trade, they find your orders
+already sitting there, and trade against them.</p>
+<h3 id="taking">Taking</h3>
+<p>On rare occasions, you might believe that the fair value is outside the current
+best bid and offer, in which case you might want to trade with the current
+market. For example, if you think <code>fair value &gt; current best offer</code>, you might
+send a buy order at <code>current best offer</code> to trade with the offer.</p>
+<p>This kind of strategy is often referred to as 'taking liquidity'.</p>
+<p>WARNING: You generally need to have a good idea of fair value to make money by
+taking liquidity! Remember markets are generally fairly efficient most of the time!</p>
+</div> 
+</div>
+</body>
+</html>
