@@ -124,6 +124,7 @@ def main():
 
         agent.operate_bond(exchange, message, data)
         agent.operate_val(exchange, message, data)
+        agent.operate_xlf(exchange, message, data)
         agent.operate_buy(exchange, message, data)
 
 

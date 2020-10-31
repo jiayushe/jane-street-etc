@@ -52,6 +52,36 @@ def operate_val(exchange, message, data: feeder.Feeder):
                 bot.buy_convert(exchange, 'VALE', 10)
                 bot.sell_symbol(exchange, 'VALBZ', sell_valbz[0][0] - 1, 7)
 
+def operate_xlf(exchange, message, data: feeder.Feeder):
+    if (message['type'] == 'trade') and (message['symbol'] == 'XLF'):
+        bond, valbz, vale, gs, ms, wfc, xlf = data.get_data()
+        if len(bond) == 0 or len(gs) == 0 or len(ms) == 0 or len(wfc) == 0 or len(xlf) == 0:
+            return
+
+        partition = 5
+        bond_price = mean(bond[-partition:])
+        gs_price = mean(gs[-partition:])
+        ms_price = mean(ms[-partition:])
+        wfc_price = mean(wfc[-partition:])
+        xlf_price = mean(xlf[-partition:])
+
+        size = 2
+
+        if (10 * xlf_price + 100 < (3 * bond_price + 2 * gs_price + 3 * ms_price + 2 * wfc_price)):
+            bot.buy_symbol(exchange, "XLF", xlf_price, 10 * size)
+            bot.sell_convert(exchange, "XLF", 10 * size)
+            bot.sell_symbol(exchange, "BOND", bond_price, 3 * size)
+            bot.sell_symbol(exchange, "GS", gs_price, 2 * size)
+            bot.sell_symbol(exchange, "MS", ms_price, 3 * size)
+            bot.sell_symbol(exchange, "WFC", wfc_price, 2 * size)
+        elif (10 * xlf_price - 100 > (3 * bond_price + 2 * gs_price + 3 * ms_price + 2 * wfc_price)):
+            bot.buy_symbol(exchange, "BOND", bond_price, 3 * size)
+            bot.buy_symbol(exchange, "GS", gs_price, 2 * size)
+            bot.buy_symbol(exchange, "MS", ms_price, 3 * size)
+            bot.buy_symbol(exchange, "WFC", wfc_price, 2 * size)
+            bot.buy_convert(exchange, "XLF", 10 * size)
+            bot.sell_symbol(exchange, "XLF", xlf_price, 10 * size)
+
 def _is_buy(price_list):
     if len(price_list) < 9:
         return INFPOS
@@ -102,30 +132,30 @@ def operate_buy(exchange, message, data: feeder.Feeder):
 
         if min(list1) != INFPOS:
             pos = list1.index(min(list1))
-            if pos == 0:
+            if pos == 0 and len(buy_valbz):
                 bot.buy_symbol(exchange, 'VALBZ', buy_valbz[0][0] + 2, 10)
-            if pos == 1:
+            if pos == 1 and len(buy_vale):
                 bot.buy_symbol(exchange, 'VALE', buy_vale[0][0] + 2, 10)
-            if pos == 2:
+            if pos == 2 and len(buy_gs):
                 bot.buy_symbol(exchange, 'GS', buy_gs[0][0] + 2, 10)
-            if pos == 3:
+            if pos == 3 and len(buy_ms):
                 bot.buy_symbol(exchange, 'MS', buy_ms[0][0] + 2, 10)
-            if pos == 4:
+            if pos == 4 and len(buy_wfc):
                 bot.buy_symbol(exchange, 'WFC', buy_wfc[0][0] + 2, 10)
-            if pos == 5:
+            if pos == 5 and len(buy_xlf):
                 bot.buy_symbol(exchange, 'XLF', buy_xlf[0][0] + 2, 10)
 
         if max(list2) != INFNEG:
             pos = list2.index(max(list2))
-            if pos == 0:
+            if pos == 0 and len(sell_valbz):
                 bot.buy_symbol(exchange, 'VALBZ', sell_valbz[0][0] - 2, 10)
-            if pos == 1:
+            if pos == 1 and len(sell_vale):
                 bot.buy_symbol(exchange, 'VALE', sell_vale[0][0] - 2, 10)
-            if pos == 2:
+            if pos == 2 and len(sell_gs):
                 bot.buy_symbol(exchange, 'GS', sell_gs[0][0] - 2, 10)
-            if pos == 3:
+            if pos == 3 and len(sell_ms):
                 bot.buy_symbol(exchange, 'MS', sell_ms[0][0] - 2, 10)
-            if pos == 4:
+            if pos == 4 and len(sell_wfc):
                 bot.buy_symbol(exchange, 'WFC', sell_wfc[0][0] - 2, 10)
-            if pos == 5:
+            if pos == 5 and len(sell_xlf):
                 bot.buy_symbol(exchange, 'XLF', sell_xlf[0][0] - 2, 10)
