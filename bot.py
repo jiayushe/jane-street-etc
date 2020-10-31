@@ -13,7 +13,7 @@ import json
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # replace REPLACEME with your team name!
-team_name="TuringFish"
+team_name = "TuringFish"
 # This variable dictates whether or not the bot is connecting to the prod
 # or test exchange. Be careful with this switch!
 test_mode = False
@@ -22,13 +22,14 @@ test_mode = False
 # 0 is prod-like
 # 1 is slower
 # 2 is empty
-test_exchange_index=2
-prod_exchange_hostname="production"
+test_exchange_index = 2
+prod_exchange_hostname = "production"
 
-port=25000 + (test_exchange_index if test_mode else 0)
+port = 25000 + (test_exchange_index if test_mode else 0)
 exchange_hostname = "test-exch-" + team_name if test_mode else prod_exchange_hostname
 
-currentId = 0
+currentId = 1000
+
 
 # ~~~~~============== NETWORKING CODE ==============~~~~~
 
@@ -66,7 +67,7 @@ def buy_symbol(exchange, symbol, price, size):
     global currentId
     write_to_exchange(exchange, {
         "type": "add",
-        "order_id":currentId,
+        "order_id": currentId,
         "symbol": symbol,
         "dir": "BUY",
         "price": price,
@@ -74,6 +75,10 @@ def buy_symbol(exchange, symbol, price, size):
     })
     currentId += 1
     return currentId
+
+
+def prettify(message):
+    return json.dumps(message, indent=4, sort_keys=True)
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -85,15 +90,21 @@ def main():
     # time for every read_from_exchange() response.
     # Since many write messages generate marketdata, this will cause an
     # exponential explosion in pending messages. Please, don't do that!
-    print("The exchange replied:", hello_from_exchange, file=sys.stderr)
+    print("The exchange replied:", prettify(hello_from_exchange), file=sys.stderr)
+    buy_symbol(exchange, "BOND", 999, 50)
+    message = read_from_exchange(exchange)
+    print("BUY BOND: The exchange replied:", prettify(message), file=sys.stderr)
+
+    sell_symbol(exchange, "BOND", 1001, 50)
+    message = read_from_exchange(exchange)
+    print("SELL BOND: The exchange replied:", prettify(message), file=sys.stderr)
+
     while True:
         message = read_from_exchange(exchange)
-        if(message["type"] == "close"):
+        if (message["type"] == "close"):
             print("The round has ended")
             break
 
-        buy_symbol(exchange, "BOND", 999, 50)
-        sell_symbol(exchange, "BOND", 1001, 50)
 
 if __name__ == "__main__":
     main()
