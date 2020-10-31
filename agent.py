@@ -83,7 +83,7 @@ def operate_buy(exchange, message, data: feeder.Feeder):
         bond, valbz, vale, gs, ms, wfc, xlf = data.get_data()
 
         book = data.read_market()
-        print(book)
+        # print(book)
         if 'VALBZ' in book:
             buy_valbz, sell_valbz = book['VALBZ']
         if 'VALE' in book:
