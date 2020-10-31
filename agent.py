@@ -65,22 +65,36 @@ def operate_xlf(exchange, message, data: feeder.Feeder):
         wfc_price = mean(wfc[-partition:])
         xlf_price = mean(xlf[-partition:])
 
+        book = data.read_market()
+        if 'BOND' in book:
+            buy_bond, sell_bond = book['BOND']
+        if 'GS' in book:
+            buy_gs, sell_gs = book['GS']
+        if 'MS' in book:
+            buy_ms, sell_ms = book['MS']
+        if 'WFC' in book:
+            buy_wfc, sell_wfc = book['WFC']
+        if 'XLF' in book:
+            buy_xlf, sell_xlf = book['XLF']
+
         size = 2
 
-        if (10 * xlf_price + 100 < (3 * bond_price + 2 * gs_price + 3 * ms_price + 2 * wfc_price)):
-            bot.buy_symbol(exchange, "XLF", xlf_price, 10 * size)
+        if (10 * xlf_price + 100 < (3 * bond_price + 2 * gs_price + 3 * ms_price + 2 * wfc_price)) \
+            and len(buy_xlf) and len(sell_bond) and len(sell_gs) and len(sell_ms) and len(sell_wfc):
+            bot.buy_symbol(exchange, "XLF", buy_xlf[0][0] + 1, 10 * size)
             bot.sell_convert(exchange, "XLF", 10 * size)
-            bot.sell_symbol(exchange, "BOND", bond_price, 3 * size)
-            bot.sell_symbol(exchange, "GS", gs_price, 2 * size)
-            bot.sell_symbol(exchange, "MS", ms_price, 3 * size)
-            bot.sell_symbol(exchange, "WFC", wfc_price, 2 * size)
-        elif (10 * xlf_price - 100 > (3 * bond_price + 2 * gs_price + 3 * ms_price + 2 * wfc_price)):
-            bot.buy_symbol(exchange, "BOND", bond_price, 3 * size)
-            bot.buy_symbol(exchange, "GS", gs_price, 2 * size)
-            bot.buy_symbol(exchange, "MS", ms_price, 3 * size)
-            bot.buy_symbol(exchange, "WFC", wfc_price, 2 * size)
+            bot.sell_symbol(exchange, "BOND", sell_bond[0][0] - 1, 3 * size)
+            bot.sell_symbol(exchange, "GS", sell_gs[0][0] - 1, 2 * size)
+            bot.sell_symbol(exchange, "MS", sell_ms[0][0] - 1, 3 * size)
+            bot.sell_symbol(exchange, "WFC", sell_wfc[0][0] - 1, 2 * size)
+        elif (10 * xlf_price - 100 > (3 * bond_price + 2 * gs_price + 3 * ms_price + 2 * wfc_price)) \
+            and len(sell_xlf) and len(buy_bond) and len(buy_gs) and len(buy_ms) and len(buy_wfc):
+            bot.buy_symbol(exchange, "BOND", buy_bond[0][0] + 1, 3 * size)
+            bot.buy_symbol(exchange, "GS", buy_gs[0][0] + 1, 2 * size)
+            bot.buy_symbol(exchange, "MS", buy_ms[0][0] + 1, 3 * size)
+            bot.buy_symbol(exchange, "WFC", buy_wfc[0][0] + 1, 2 * size)
             bot.buy_convert(exchange, "XLF", 10 * size)
-            bot.sell_symbol(exchange, "XLF", xlf_price, 10 * size)
+            bot.sell_symbol(exchange, "XLF", sell_xlf[0][0] - 1, 10 * size)
 
 def _is_buy(price_list):
     if len(price_list) < 9:
@@ -113,7 +127,6 @@ def operate_buy(exchange, message, data: feeder.Feeder):
         bond, valbz, vale, gs, ms, wfc, xlf = data.get_data()
 
         book = data.read_market()
-        # print(book)
         if 'VALBZ' in book:
             buy_valbz, sell_valbz = book['VALBZ']
         if 'VALE' in book:
