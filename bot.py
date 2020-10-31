@@ -80,6 +80,17 @@ def buy_symbol(exchange, symbol, price, size):
 def prettify(message):
     return json.dumps(message, indent=4, sort_keys=True)
 
+# ~~~~~============== Strategies ==============~~~~~
+
+
+def top_up_bond(exchange, message):
+    if message["type"] == "fill" and message["symbol"] == "BOND":
+        print(message["dir"], message["size"], "BONDS")
+        if message["dir"] == "BUY":
+            buy_symbol(exchange, "BOND", 999, message["size"])
+        else:
+            sell_symbol(exchange, "BOND", 1001, message["size"])
+
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
 def main():
@@ -92,18 +103,15 @@ def main():
     # exponential explosion in pending messages. Please, don't do that!
     print("The exchange replied:", prettify(hello_from_exchange), file=sys.stderr)
     buy_symbol(exchange, "BOND", 999, 50)
-    message = read_from_exchange(exchange)
-    print("BUY BOND: The exchange replied:", prettify(message), file=sys.stderr)
-
     sell_symbol(exchange, "BOND", 1001, 50)
-    message = read_from_exchange(exchange)
-    print("SELL BOND: The exchange replied:", prettify(message), file=sys.stderr)
 
     while True:
         message = read_from_exchange(exchange)
+        # print("The exchange replied:", prettify(message), file=sys.stderr)
         if (message["type"] == "close"):
             print("The round has ended")
             break
+        top_up_bond(exchange, message)
 
 
 if __name__ == "__main__":
